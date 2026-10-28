@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数据报表</title>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      body {
+        font-family: -apple-system, "Helvetica Neue", Arial, sans-serif;
+        background: #f0f2f5;
+        color: #303133;
+        padding: 24px;
+      }
+      h1 {
+        font-size: 22px;
+        text-align: center;
+        margin-bottom: 24px;
+        color: #303133;
+      }
+      .summary {
+        display: flex;
+        gap: 16px;
+        margin-bottom: 24px;
+        flex-wrap: wrap;
+      }
+      .card {
+        flex: 1;
+        min-width: 160px;
+        background: #fff;
+        border-radius: 8px;
+        padding: 20px;
+        box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+        text-align: center;
+      }
+      .card .label {
+        font-size: 13px;
+        color: #909399;
+        margin-bottom: 8px;
+      }
+      .card .value {
+        font-size: 28px;
+        font-weight: 600;
+        color: #409eff;
+      }
+      .card .value.green { color: #67c23a; }
+      .card .value.orange { color: #e6a23c; }
+      .card .value.red { color: #f56c6c; }
+      .table-wrap {
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+        overflow: hidden;
+      }
+      .table-title {
+        font-size: 16px;
+        font-weight: 600;
+        padding: 16px 20px;
+        border-bottom: 1px solid #ebeef5;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      th, td {
+        padding: 12px 20px;
+        text-align: left;
+        border-bottom: 1px solid #ebeef5;
+        font-size: 14px;
+      }
+      th {
+        background: #fafafa;
+        color: #909399;
+        font-weight: 500;
+      }
+      tr:last-child td { border-bottom: none; }
+      tr:hover td { background: #f5f7fa; }
+      .bar-cell {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .bar {
+        height: 8px;
+        border-radius: 4px;
+        background: #409eff;
+      }
+      .footer {
+        text-align: center;
+        margin-top: 24px;
+        font-size: 12px;
+        color: #c0c4cc;
+      }
+    </style>
+  </head>
+  <body>
+    <h1 id="reportTitle">销售数据报表</h1>
+
+    <div class="summary" id="summaryCards">
+      <div class="card">
+        <div class="label">总销售额</div>
+        <div class="value" id="totalSales">¥128,430</div>
+      </div>
+      <div class="card">
+        <div class="label">订单数</div>
+        <div class="value green" id="totalOrders">356</div>
+      </div>
+      <div class="card">
+        <div class="label">客单价</div>
+        <div class="value orange" id="avgPrice">¥360.76</div>
+      </div>
+      <div class="card">
+        <div class="label">退款率</div>
+        <div class="value red" id="refundRate">2.8%</div>
+      </div>
+    </div>
+
+    <div class="table-wrap">
+      <div class="table-title">月度销售明细</div>
+      <table id="dataTable">
+        <thead>
+          <tr>
+            <th>月份</th>
+            <th>销售额</th>
+            <th>订单数</th>
+            <th>占比</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody">
+        </tbody>
+      </table>
+    </div>
+
+    <div class="footer" id="footer">报表生成时间：<span id="genTime"></span></div>
+
+    <script>
+      (function () {
+        var data = [
+          { month: '1月', sales: 18200, orders: 52 },
+          { month: '2月', sales: 15300, orders: 43 },
+          { month: '3月', sales: 22100, orders: 61 },
+          { month: '4月', sales: 19800, orders: 55 },
+          { month: '5月', sales: 24500, orders: 72 },
+          { month: '6月', sales: 28530, orders: 73 }
+        ]
+
+        var totalSales = data.reduce(function (s, d) { return s + d.sales }, 0)
+        var tbody = document.getElementById('tableBody')
+
+        data.forEach(function (d) {
+          var pct = ((d.sales / totalSales) * 100).toFixed(1)
+          var tr = document.createElement('tr')
+          tr.innerHTML =
+            '<td>' + d.month + '</td>' +
+            '<td>¥' + d.sales.toLocaleString() + '</td>' +
+            '<td>' + d.orders + '</td>' +
+            '<td><div class="bar-cell"><div class="bar" style="width:' + pct + '%;max-width:120px"></div><span>' + pct + '%</span></div></td>'
+          tbody.appendChild(tr)
+        })
+
+        var now = new Date()
+        var pad = function (n) { return n < 10 ? '0' + n : n }
+        document.getElementById('genTime').textContent =
+          now.getFullYear() + '-' + pad(now.getMonth() + 1) + '-' + pad(now.getDate()) + ' ' +
+          pad(now.getHours()) + ':' + pad(now.getMinutes()) + ':' + pad(now.getSeconds())
+      })()
+    </script>
+  </body>
+</html>
